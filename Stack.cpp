@@ -26,7 +26,6 @@ bool Stack<T>::is_full() {
 
 template <class T>
 void Stack<T>::push(T value){
-    std::cout << is_full() ;
     if (!is_full()) this->arr[++top] = value ;
     else throw "stack is full" ;
 

@@ -25,20 +25,35 @@ int main() {
     precedence['^'] = 3 ;
 
     string infix= "1-2^3^3-(4+5*6)*7" ;
-
-    for(int i = 0 ; i < infix.length() ; i++){
-        char hold = infix.at(i) ;
-        if(!find_operator((char)hold)) postfix += hold ;
-        else{
-            if (checker((char)hold) || hold == '(' ) operators->push((char)hold) ;
+    try {
+        for (int i = 0; i < infix.length(); i++) {
+            char hold = infix.at(i);
+            if (!find_operator((char) hold) && hold != '(' && hold != ')') postfix += hold;
             else {
-                pop_operators(hold) ;
-                if(hold != ')'){
-                    operators->push(hold) ;
+                if (checker((char) hold) || hold == '(' || operators->is_empty()){
+                    operators->push((char) hold);
+                    if(hold == '('){
+                        last_precedence = 0 ;
+                    }
+                }
+                else {
+                    pop_operators(hold);
+                    if (hold != ')') {
+                        operators->push(hold);
+                    }
                 }
             }
+            cout << " inside loop : " << postfix << endl ;
         }
+    }catch (const char *err){
+        cout << err << endl ;
     }
+
+    while(!operators->is_empty()){
+        postfix += operators->pop() ;
+    }
+
+    cout << postfix ;
 
     return 0;
 }
@@ -49,16 +64,23 @@ void pop_operators(char scanned_operator){
     map<char , int >::iterator it ;
 
     while(1){
+
         char operator_precedence = operators->pop() ;
         it = precedence.find(operator_precedence) ;
         last_precedence = it->second ;
         if(checker(scanned_operator)) {
             operators->push(operator_precedence) ;
             break ;
-        }else if(operator_precedence == '(' || operator_precedence == ')'){
+        }else if(operator_precedence == '('){
             break ;
         }else{
-            postfix += operator_precedence ;
+            if(operator_precedence != '('){
+                postfix += operator_precedence ;
+            }
+            if(operators->is_empty()){
+                last_precedence = 0 ;
+                break ;
+            }
             continue ;
         }
     }
